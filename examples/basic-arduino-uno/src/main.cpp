@@ -3,13 +3,30 @@
 
 ProcessQueue queue;
 
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.println(queue.size());
-  queue.push(21);
-  queue.push(22);
-  queue.push(23);
+  queue.push(
+    []()
+    { 
+      Serial.println("function 1"); 
+    }
+    );
+  queue.push(
+    []()
+    {
+      Serial.println("function 2");
+    }
+    );
+  queue.push(
+    []()
+    {
+      Serial.println("function 3"); 
+    }
+    );
+
   Serial.println(queue.size());
   queue.pop();
   Serial.println(queue.size());
@@ -17,6 +34,7 @@ void setup() {
   Serial.println(queue.size());
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
 }

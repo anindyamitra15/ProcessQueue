@@ -20,10 +20,12 @@
 #define MAX_PROCS 100U
 #define DEBUG_SERIAL Serial
 
+typedef void(* void_function)(void);
+
 // Node structure
 struct Node
 {
-    int func_ptr;
+    void_function func_ptr;
     struct Node *next;
 };
 
@@ -39,10 +41,10 @@ public:
     ProcessQueue();
     ~ProcessQueue();
     unsigned long size();
-    void push(int);
-    int pop(void);
-    int front();
-    int rear();
+    void push(void_function);
+    void pop(void);
+    void front();
+    void rear();
     void clear(void);
 };
 

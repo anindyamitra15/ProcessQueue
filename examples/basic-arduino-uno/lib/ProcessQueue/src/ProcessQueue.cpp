@@ -26,25 +26,25 @@ unsigned long ProcessQueue::size()
  * TODO: apply MAX_SIZE Protection
  * @param value
  */
-void ProcessQueue::push(int value)
+void ProcessQueue::push(void_function func_ptr)
 {
     DEBUG_SERIAL.println("push()");
     if (_rear == NULL)
     {
         _rear = (struct Node *)malloc(sizeof(struct Node));
         _rear->next = NULL;
-        _rear->func_ptr = value;
+        _rear->func_ptr = func_ptr;
         _front = _rear;
     }
     else
     {
         __temp = (struct Node *)malloc(sizeof(struct Node));
         _rear->next = __temp;
-        __temp->func_ptr = value;
+        __temp->func_ptr = func_ptr;
         __temp->next = NULL;
         _rear = __temp;
     }
-    DEBUG_SERIAL.println(_rear->func_ptr);
+    // _rear->func_ptr();
     __active_procs++;
 }
 
@@ -53,14 +53,15 @@ void ProcessQueue::push(int value)
  *
  * @return function pointer
  */
-int ProcessQueue::pop()
+void ProcessQueue::pop()
 {
     DEBUG_SERIAL.println("pop()");
     __temp = _front;
     if (_front == NULL)
     {
         // handle underflow condition
-        return 0;
+        // return 0;
+        return;
     }
     else
     {
@@ -68,7 +69,7 @@ int ProcessQueue::pop()
         {
             __temp = __temp->next;
             // TODO: _front->func_ptr();
-            DEBUG_SERIAL.println(_front->func_ptr);
+            _front->func_ptr();
             // free the allocated memory in _front
             free(_front);
             _front = __temp;
@@ -76,14 +77,14 @@ int ProcessQueue::pop()
         else
         {
             // TODO: _front->func_ptr();
-            DEBUG_SERIAL.println(_front->func_ptr);
+            _front->func_ptr();
             free(_front);
             _front = NULL;
             _rear = NULL;
         }
     }
     __active_procs--;
-    return 0;
+    // return 0;
 }
 
 /**
@@ -97,4 +98,14 @@ void ProcessQueue::clear()
     {
         pop();
     }
+}
+
+void ProcessQueue::front()
+{
+    _front->func_ptr();
+}
+
+void ProcessQueue::rear()
+{
+    _rear->func_ptr();
 }
