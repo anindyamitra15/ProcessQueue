@@ -46,6 +46,8 @@ public:
     void front();
     void rear();
     void clear(void);
+    bool isEmpty();
+    bool isFull();
 };
 
 #endif

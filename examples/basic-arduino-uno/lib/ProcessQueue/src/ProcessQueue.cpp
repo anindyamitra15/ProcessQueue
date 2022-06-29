@@ -29,6 +29,11 @@ unsigned long ProcessQueue::size()
 void ProcessQueue::push(void_function func_ptr)
 {
     DEBUG_SERIAL.println("push()");
+    if (__active_procs >= MAX_PROCS)
+    {
+        DEBUG_SERIAL.println("Overflow");
+        return;
+    }
     if (_rear == NULL)
     {
         _rear = (struct Node *)malloc(sizeof(struct Node));
@@ -56,15 +61,10 @@ void ProcessQueue::push(void_function func_ptr)
 void ProcessQueue::pop()
 {
     DEBUG_SERIAL.println("pop()");
-    __temp = _front;
-    if (_front == NULL)
+
+    if (_front != NULL)
     {
-        // handle underflow condition
-        // return 0;
-        return;
-    }
-    else
-    {
+        __temp = _front;
         if (__temp->next != NULL) // if exists
         {
             __temp = __temp->next;
@@ -83,8 +83,11 @@ void ProcessQueue::pop()
             _rear = NULL;
         }
     }
+    else
+    {
+        DEBUG_SERIAL.println("Underflow");
+    }
     __active_procs--;
-    // return 0;
 }
 
 /**
@@ -92,7 +95,7 @@ void ProcessQueue::pop()
  *
  */
 void ProcessQueue::clear()
-{
+{ // FIXME: clear should ssilently pop and not call the function
     DEBUG_SERIAL.println("clear()");
     for (unsigned long i = 0; i <= __active_procs; i++)
     {
@@ -108,4 +111,14 @@ void ProcessQueue::front()
 void ProcessQueue::rear()
 {
     _rear->func_ptr();
+}
+
+bool ProcessQueue::isEmpty()
+{
+    return (__active_procs <= 0);
+}
+
+bool ProcessQueue::isFull()
+{
+    return (__active_procs == MAX_PROCS);
 }
