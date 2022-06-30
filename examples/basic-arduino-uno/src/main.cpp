@@ -1,18 +1,14 @@
 #include <Arduino.h>
-#include <CircularQueue.h>
 #include <ProcessQueue.h>
 
-CircularQueue<void_function> queue;
+ProcessQueue p_queue;
 
-#define QUEUE_SIZE 4U
-// ProcessQueue queue;
-
-// void_function event = []()
-// {
-//   Serial.println("Event Triggered");
-//   delay(3000);
-//   Serial.println("Event Serviced");
-// };
+void_function event = []()
+{
+  Serial.println("Event Triggered");
+  delay(3000);
+  Serial.println("Event Serviced");
+};
 
 void func1()
 {
@@ -21,7 +17,7 @@ void func1()
 
 void ISR_func()
 {
-  queue.push(func1);
+  p_queue.push(event);
 }
 
 void setup()
@@ -34,33 +30,11 @@ void setup()
       digitalPinToInterrupt(2),
       ISR_func, // element is pushed to the queue through interrupt
       FALLING);
-
-  // queue.push(3);
-  // queue.push(4);
-  // queue.push(5);
-
-  // queue.display();
-  // Serial.println(queue.pop());
-  // queue.display();
-
-  // queue.push(6);
-  // queue.display();
-  // queue.push(7); // should trigger overflow
-  // queue.display();
-
-  // Serial.println(queue.size());
-  // Serial.println(queue.pop());
-  // Serial.println(queue.pop());
-  // Serial.println(queue.pop());
-  // Serial.println(queue.size());
 }
 
 void loop()
 {
-  if (!queue.isEmpty())
-  {
-    (queue.pop())();
-  }
+  p_queue.loop();
   // static uint32_t last_time = 0;
   // if (millis() - last_time > 500)
   // {

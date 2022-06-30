@@ -2,7 +2,7 @@
 
 ProcessQueue::ProcessQueue()
 {
-    __active_procs = 0;
+    clear();
 }
 
 ProcessQueue::~ProcessQueue()
@@ -15,10 +15,10 @@ ProcessQueue::~ProcessQueue()
  *
  * @return unsigned long
  */
-unsigned long ProcessQueue::size()
+inline unsigned long ProcessQueue::size()
 {
     DEBUG_SERIAL.println("size()");
-    return __active_procs;
+    return __queue__.size();
 }
 
 /**
@@ -29,100 +29,87 @@ unsigned long ProcessQueue::size()
 void ProcessQueue::push(void_function func_ptr)
 {
     DEBUG_SERIAL.println("push()");
-    if (__active_procs >= MAX_PROCS)
-    {
-        DEBUG_SERIAL.println("Overflow");
-        return;
-    }
-    if (_rear == NULL)
-    {
-        _rear = (struct Node *)malloc(sizeof(struct Node));
-        _rear->func_ptr = func_ptr;
-        _rear->next = NULL;
-        _front = _rear;
-    }
-    else
-    {
-        __temp = (struct Node *)malloc(sizeof(struct Node));
-        _rear->next = __temp;
-        __temp->func_ptr = func_ptr;
-        __temp->next = NULL;
-        _rear = __temp;
-    }
-    // _rear->func_ptr();
-    __active_procs++;
+    __queue__.push(func_ptr);
 }
 
 /**
- * @brief returns a function pointer to the caller
- *
- * @return function pointer
+ * @brief executes the function popped
+ * from the queue
  */
 void ProcessQueue::pop()
 {
     DEBUG_SERIAL.println("pop()");
-    if (isEmpty())
-    {
-        DEBUG_SERIAL.println("Underflow");
-        return;
-    }
-
-    if (_front != NULL)
-    {
-        __temp = _front;
-        if (__temp->next != NULL) // if exists
-        {
-            __temp = __temp->next;
-            // TODO: _front->func_ptr();
-            _front->func_ptr();
-            // free the allocated memory in _front
-            free(_front);
-            _front = __temp;
-        }
-        else
-        {
-            // TODO: _front->func_ptr();
-            _front->func_ptr();
-            free(_front);
-            _front = NULL;
-            _rear = NULL;
-        }
-    }
-    __active_procs--;
+    void_function temp = __queue__.pop();
+    if (temp != NULL || temp != 0x0)
+        temp();
+    else
+        DEBUG_SERIAL.println("NULL reference in function");
 }
 
 /**
- * @brief clears the entire queue (use with caution!)
- *
+ * @brief Process Queue event loop function
+ * put it inside while(1) or void loop()
  */
-void ProcessQueue::clear()
-{ // FIXME: clear should silently pop and not call the function
-    DEBUG_SERIAL.println("clear()");
-    while (_front != NULL)
+void ProcessQueue::loop()
+{
+    if (!isEmpty())
     {
-        __temp = _front;
-        _front = _front->next;
-        free(__temp);
+        pop();
     }
 }
 
-void_function ProcessQueue::front()
+/**
+ * @brief clears the entire queue
+ * (use with caution!)
+ */
+inline void ProcessQueue::clear()
 {
-    return _front->func_ptr;
+    DEBUG_SERIAL.println("clear()");
+    __queue__.reset();
 }
 
-void_function ProcessQueue::rear()
+/**
+ * @brief returns the function pointer of
+ * the function at the front of the queue
+ * without modifying the queue
+ *
+ * @return void_function
+ */
+inline void_function ProcessQueue::front()
 {
-    return _rear->func_ptr;
+    return __queue__.peek();
 }
 
-bool ProcessQueue::isEmpty()
+/**
+ * @brief return the function pointer of
+ * the function at the rear of the queue
+ * without modifying the queue
+ *
+ * @return void_function
+ */
+inline void_function ProcessQueue::rear()
 {
-    return (_front == NULL);
+    return __queue__.peek_rear();
 }
 
-bool ProcessQueue::isFull()
+/**
+ * @brief boolean to check if queue is empty
+ *
+ * @return true, if queue empty
+ * @return false, if queue has some functions
+ */
+inline bool ProcessQueue::isEmpty()
 {
-    // TODO: change impl
-    return (__active_procs == MAX_PROCS);
+    return __queue__.isEmpty();
+}
+
+/**
+ * @brief boolean to check if queue is full
+ *
+ * @return true, if queue full
+ * @return false, if queue has some space
+ */
+inline bool ProcessQueue::isFull()
+{
+    return __queue__.isFull();
 }

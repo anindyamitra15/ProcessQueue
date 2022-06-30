@@ -15,42 +15,35 @@
 #define __ProcessQueue_H__
 
 #include "Arduino.h"
+#include "CircularQueue.h"
 
 // Maximum number of processes you want to enqueue in the process queue just for safety, system is dynamic
 #define MAX_PROCS 10U
 #define DEBUG_SERIAL Serial
 
+#undef QUEUE_SIZE
+#define QUEUE_SIZE MAX_PROCS
+
 // void(void) function pointer type
 typedef void (*void_function)(void);
 
-// Node structure
-struct Node
-{
-    void_function func_ptr;
-    struct Node *next;
-};
-
-typedef struct Node Node;
-
 class ProcessQueue
 {
-private:
-    unsigned long __active_procs;
-    struct Node *_front = NULL;
-    struct Node *_rear = NULL;
-    struct Node *__temp = NULL;
-
 public:
     ProcessQueue();
     ~ProcessQueue();
     unsigned long size();
     void push(void_function);
-    void pop(void);
+    void pop();
+    void loop();
     void_function front();
     void_function rear();
     void clear(void);
     bool isEmpty();
     bool isFull();
+
+private:
+    CircularQueue<void_function> __queue__;
 };
 
 #endif

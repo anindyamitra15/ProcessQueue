@@ -3,14 +3,7 @@
 
 #include "Arduino.h"
 #define DETAIL_STRING_LEN 20
-#define QUEUE_SIZE 3U
-#define DEBUG_SERIAL Serial
-
-// struct Node
-// {
-//     int element;
-//     char details[DETAIL_STRING_LEN];
-// };
+#define QUEUE_SIZE 3U // FINITE SIZE
 
 template <typename T>
 class CircularQueue
@@ -20,94 +13,95 @@ public:
     {
         __front = -1;
         __rear = -1;
-        __queue[QUEUE_SIZE] = {0};
-    }
-
-    ~CircularQueue()
-    {
-        // not needed here
+        __queue_array[QUEUE_SIZE] = {0};
     }
 
     /**
      * @brief enqueues an element to the queue array
      *
      * @param element
+     * @return true, if successful
+     * @return false, if overflow
      */
-    void push(T element)
+    bool push(T element)
     {
-        DEBUG_SERIAL.println("push()");
         if (isFull())
-        {
-            DEBUG_SERIAL.println("Overflow");
-        }
-        else if (__front < 0 && __rear < 0)
+            return false;
+
+        if (__front < 0 && __rear < 0)
         {
             __front = 0;
             __rear = 0;
-            __queue[__rear] = element;
+            __queue_array[__rear] = element;
         }
         else
         {
             __rear = (__rear + 1) % QUEUE_SIZE;
-            __queue[__rear] = element;
+            __queue_array[__rear] = element;
         }
+        return true;
     }
 
     /**
      * @brief pops the front queue element and returns it to the caller
      *
-     * @return int
+     * @return variable of type T which is popped
      */
     T pop()
     {
-        DEBUG_SERIAL.println("pop()");
-        T temp;
+        long temp_index;
+
         if (__front < 0 && __rear < 0)
+            return NULL;
+
+        if (__front == __rear)
         {
-            DEBUG_SERIAL.println("Underflow");
-            temp = 0;
-        }
-        else if (__front == __rear)
-        {
-            temp = __queue[__front];
-            // just reset the heads
+            temp_index = __front; // holding the index temporarily
+            // just resetting the heads
             __front = -1;
             __rear = -1;
+            return __queue_array[temp_index];
         }
         else
         {
-            temp = __queue[__front];
+            temp_index = __front; // holding the index temporarily
             __front = (__front + 1) % QUEUE_SIZE;
+            return __queue_array[temp_index];
         }
-        return temp;
-    }
-
-    int peek()
-    {
-        return __queue[__front];
     }
 
     /**
-     * @brief just for debugging, will be removed later
-     *
+     * @brief silently reset the queue without modifying the elements
+     * basically resetting the front and rear heads
      */
-    void display()
+    void reset()
     {
-        DEBUG_SERIAL.println("display()");
-        String im = "front: " + String(__front) + ", rear: " + String(__rear);
-        DEBUG_SERIAL.println(im);
-        unsigned int i = __front - 1;
-        do
-        {
-            i = (i + 1) % QUEUE_SIZE;
-            String ind = String(i) + ": ";
-            DEBUG_SERIAL.print(ind);
-            DEBUG_SERIAL.println(__queue[i]);
-        } while (i != __rear);
+        __front = -1;
+        __rear = -1;
     }
 
     /**
-     * @brief returns true if the queue is empty
+     * @brief returns the reference without popping
+     *
+     * @return variable of type specified
+     */
+    T peek()
+    {
+        return __queue_array[__front];
+    }
+
+    /**
+     * @brief returns the reference from the rear without modifying queue
+     *
+     * @return variable of type specified
+     */
+    T peek_rear()
+    {
+        return __queue_array[__rear];
+    }
+
+    /**
+     * @brief boolean to show if the queue is empty
      *
      * @return true, if queue is empty
      * @return false, if queue has some element
@@ -117,14 +111,24 @@ public:
         return (__front < 0 && __rear < 0);
     }
 
+    /**
+     * @brief boolean to show if the queue is Full
+     *
+     * @return true, if queue is full
+     * @return false, if queue has space
+     */
     bool isFull()
     {
         return ((__rear + 1) % QUEUE_SIZE == __front);
     }
 
-    unsigned int size()
+/**
+ * @brief returns the size of the active queue
+ * 
+ * @return unsigned int 
+ */
+    unsigned long size()
     {
-        DEBUG_SERIAL.println("size()");
         if (isEmpty())
             return 0;
         else if (__rear >= __front)
@@ -134,8 +138,7 @@ public:
     }
 
 private:
-    unsigned long active_size;
-    T __queue[QUEUE_SIZE];
+    T __queue_array[QUEUE_SIZE];
     long __front;
     long __rear;
 };
