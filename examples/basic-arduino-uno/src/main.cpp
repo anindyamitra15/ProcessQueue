@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <CircularQueue.h>
+#include <ProcessQueue.h>
 
-CircularQueue queue;
+CircularQueue<void_function> queue;
 
-// #include <ProcessQueue.h>
-
+#define QUEUE_SIZE 4U
 // ProcessQueue queue;
 
 // void_function event = []()
@@ -14,8 +14,14 @@ CircularQueue queue;
 //   Serial.println("Event Serviced");
 // };
 
+void func1()
+{
+  Serial.println("func1()");
+}
+
 void ISR_func()
 {
+  queue.push(func1);
 }
 
 void setup()
@@ -29,32 +35,32 @@ void setup()
       ISR_func, // element is pushed to the queue through interrupt
       FALLING);
 
-  queue.push(3);
-  queue.push(4);
-  queue.push(5);
+  // queue.push(3);
+  // queue.push(4);
+  // queue.push(5);
 
-  queue.display();
-  Serial.println(queue.pop());
-  queue.display();
+  // queue.display();
+  // Serial.println(queue.pop());
+  // queue.display();
 
-  queue.push(6);
-  queue.display();
-  queue.push(7); // should trigger overflow
-  queue.display();
+  // queue.push(6);
+  // queue.display();
+  // queue.push(7); // should trigger overflow
+  // queue.display();
 
-  Serial.println(queue.size());
-  Serial.println(queue.pop());
-  Serial.println(queue.pop());
-  Serial.println(queue.pop());
-  Serial.println(queue.size());
+  // Serial.println(queue.size());
+  // Serial.println(queue.pop());
+  // Serial.println(queue.pop());
+  // Serial.println(queue.pop());
+  // Serial.println(queue.size());
 }
 
 void loop()
 {
-  // if (!queue.isEmpty())
-  // {
-  //   queue.pop();
-  // }
+  if (!queue.isEmpty())
+  {
+    (queue.pop())();
+  }
   // static uint32_t last_time = 0;
   // if (millis() - last_time > 500)
   // {
