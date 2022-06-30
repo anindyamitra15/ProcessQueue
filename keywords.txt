@@ -1,0 +1,18 @@
+# Macros
+MAX_PROCS	    KEYWORD2
+DEBUG_SERIAL	KEYWORD2
+
+# Methods
+push	KEYWORD2
+pop	    KEYWORD2
+size	KEYWORD2
+loop	KEYWORD2
+front	KEYWORD2
+rear	KEYWORD2
+clear	KEYWORD2
+isEmpty	KEYWORD2
+isFull	KEYWORD2
+
+# Type names
+ProcessQueue	KEYWORD1	DATA_TYPE
+CircularQueue	KEYWORD1	DATA_TYPE
