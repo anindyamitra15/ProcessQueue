@@ -1,0 +1,21 @@
+{
+  "name": "ProcessQueue",
+  "keywords": "process, embedded, queue",
+  "description": "This is a library which implements process queue for Arduino.",
+  "homepage": "https://github.com/anindyamitra15/ProcessQueue",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anindyamitra15/ProcessQueue.git"
+  },
+  "version": "6.19.4",
+  "authors": {
+    "name": "Benoit Blanchon",
+    "url": "https://github.com/anindyamitra15"
+  },
+  "exclude": [".github", "extras"],
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "libArchive": false
+  }
+}

@@ -4,7 +4,7 @@
  * @brief This is a Library for handling Process Queues using the arduino loop()
  * Main purpose of this implementation is to get rid of kernel panics caused by interrupts.
  * Usecase: an interrupt service routine enqueues a process and the loop dequeues and runs the process keeping the ISR free.
- * @version 0.1 (takes only void(void) functions)
+ * @version 1.0 (takes only void(void) functions)
  * @date 2022-06-29
  *
  * @copyright Copyright (c) 2022
