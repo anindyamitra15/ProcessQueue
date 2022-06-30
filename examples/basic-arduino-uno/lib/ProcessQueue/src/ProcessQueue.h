@@ -17,10 +17,11 @@
 #include "Arduino.h"
 
 // Maximum number of processes you want to enqueue in the process queue just for safety, system is dynamic
-#define MAX_PROCS 100U
+#define MAX_PROCS 10U
 #define DEBUG_SERIAL Serial
 
-typedef void(* void_function)(void);
+// void(void) function pointer type
+typedef void (*void_function)(void);
 
 // Node structure
 struct Node
@@ -28,6 +29,8 @@ struct Node
     void_function func_ptr;
     struct Node *next;
 };
+
+typedef struct Node Node;
 
 class ProcessQueue
 {
@@ -43,8 +46,8 @@ public:
     unsigned long size();
     void push(void_function);
     void pop(void);
-    void front();
-    void rear();
+    void_function front();
+    void_function rear();
     void clear(void);
     bool isEmpty();
     bool isFull();

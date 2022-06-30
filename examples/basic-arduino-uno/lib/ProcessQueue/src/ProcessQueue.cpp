@@ -37,8 +37,8 @@ void ProcessQueue::push(void_function func_ptr)
     if (_rear == NULL)
     {
         _rear = (struct Node *)malloc(sizeof(struct Node));
-        _rear->next = NULL;
         _rear->func_ptr = func_ptr;
+        _rear->next = NULL;
         _front = _rear;
     }
     else
@@ -61,6 +61,11 @@ void ProcessQueue::push(void_function func_ptr)
 void ProcessQueue::pop()
 {
     DEBUG_SERIAL.println("pop()");
+    if (isEmpty())
+    {
+        DEBUG_SERIAL.println("Underflow");
+        return;
+    }
 
     if (_front != NULL)
     {
@@ -83,10 +88,6 @@ void ProcessQueue::pop()
             _rear = NULL;
         }
     }
-    else
-    {
-        DEBUG_SERIAL.println("Underflow");
-    }
     __active_procs--;
 }
 
@@ -95,30 +96,33 @@ void ProcessQueue::pop()
  *
  */
 void ProcessQueue::clear()
-{ // FIXME: clear should ssilently pop and not call the function
+{ // FIXME: clear should silently pop and not call the function
     DEBUG_SERIAL.println("clear()");
-    for (unsigned long i = 0; i <= __active_procs; i++)
+    while (_front != NULL)
     {
-        pop();
+        __temp = _front;
+        _front = _front->next;
+        free(__temp);
     }
 }
 
-void ProcessQueue::front()
+void_function ProcessQueue::front()
 {
-    _front->func_ptr();
+    return _front->func_ptr;
 }
 
-void ProcessQueue::rear()
+void_function ProcessQueue::rear()
 {
-    _rear->func_ptr();
+    return _rear->func_ptr;
 }
 
 bool ProcessQueue::isEmpty()
 {
-    return (__active_procs <= 0);
+    return (_front == NULL);
 }
 
 bool ProcessQueue::isFull()
 {
+    // TODO: change impl
     return (__active_procs == MAX_PROCS);
 }
