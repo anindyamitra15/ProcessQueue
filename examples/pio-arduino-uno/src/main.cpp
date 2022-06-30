@@ -1,8 +1,25 @@
+/**
+ * @file main.cpp
+ * @author Anindya Kanti Mitra (@anindyamitra15)
+ * @brief Simple demonstration which shows the application
+ * of ProcessQueue.
+ * The program uses an external (Falling edge triggered) interrupt
+ * to push a function to the queue which is then handled
+ * automatically by the loop() of the ProcessQueue
+ *
+ * @version 1.0
+ * @date 2022-07-01
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
+
 #include <Arduino.h>
 #include <ProcessQueue.h>
 
 ProcessQueue p_queue;
 
+// actual event to be triggered by the ISR
 void_function event = []()
 {
   Serial.println("Event Triggered");
@@ -10,13 +27,9 @@ void_function event = []()
   Serial.println("Event Serviced");
 };
 
-void func1()
-{
-  Serial.println("func1()");
-}
-
 void ISR_func()
 {
+  // ISR just pushes the event to the queue
   p_queue.push(event);
 }
 
@@ -35,10 +48,4 @@ void setup()
 void loop()
 {
   p_queue.loop();
-  // static uint32_t last_time = 0;
-  // if (millis() - last_time > 500)
-  // {
-  //   Serial.println(queue.size());
-  //   last_time = millis();
-  // }
 }

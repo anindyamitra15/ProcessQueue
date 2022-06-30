@@ -40,10 +40,10 @@ void ProcessQueue::pop()
 {
     DEBUG_SERIAL.println("pop()");
     void_function temp = __queue__.pop();
-    if (temp != NULL || temp != 0x0)
-        temp();
-    else
+    if (temp == NULL || temp == 0x0)
         DEBUG_SERIAL.println("NULL reference in function");
+    else
+        temp();
 }
 
 /**
